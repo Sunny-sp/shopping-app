@@ -8,11 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 // const baseUrl = 'http://localhost:8080/';
 function ProductDetails () {
     const {id} = useParams();
-    console.log('id of the product: ' + id);
+    // console.log('id of the product: ' + id);
 
     const dispatch = useDispatch();
     const productDetails = useSelector(state => state.productDetails);
     const { isLoading, product, errMess } = productDetails
+    console.log(isLoading);
+    console.log(errMess);
     useEffect(()=>{
         if(id !== undefined){
             dispatch(listProductDetails(id));
@@ -26,11 +28,9 @@ function ProductDetails () {
     const addToCartHandler = () => {
         navigate(`/cart/${product._id}?qty=${items}`);
     }
-    console.log(isLoading );
-    console.log(errMess);
-    console.log(JSON.stringify(product));
     return (
         <Container className="my-3">
+            <h1>Component</h1>
             <Link to='/home'>
                 <Button>
                     <i className="fa fa-arrow-left"></i>
@@ -72,8 +72,8 @@ function ProductDetails () {
                                     <Col>
                                         <Form.Select onChange={e => selectItems(e)}>
                                             {
-                                                [...Array(product.countInStock).keys()].map(x => 
-                                                    <option value={x+1}>{x+1}</option>
+                                                [...Array(product.countInStock).keys()].map((x, index) => 
+                                                      {return <option key={x + index} value={x+1}>{x+1}</option>}
                                                 )
                                             }
                                         </Form.Select>
@@ -83,7 +83,7 @@ function ProductDetails () {
                             : null
                         }
                         <ListGroupItem className="d-grid">
-                                <Button onClick={addToCartHandler} disabled={product.countInStock < 1}>Add to cart</Button>
+                                <Button id='Add to cart' name='Add to cart' onClick={addToCartHandler} disabled={product.countInStock < 1}>Add to cart</Button>
                         </ListGroupItem>
                     </ListGroup>
                 </Col>

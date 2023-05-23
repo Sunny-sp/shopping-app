@@ -16,6 +16,7 @@ function HomeScreen () {
     },[dispatch]);
     return (
         <>
+        <h1>Home</h1>
             {
                 isLoading ? <LoadSpinner/>
                 : errMess ? <MessageAlert variant='danger' message={errMess}/>
