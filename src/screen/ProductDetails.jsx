@@ -9,12 +9,14 @@ import { useDispatch, useSelector } from "react-redux";
 function ProductDetails () {
     const {id} = useParams();
     // console.log('id of the product: ' + id);
-
     const dispatch = useDispatch();
     const productDetails = useSelector(state => state.productDetails);
     const { isLoading, product, errMess } = productDetails
-    console.log(isLoading);
-    console.log(errMess);
+    console.log('product: ' + JSON.stringify(productDetails.product.name));
+    console.log('useSlector: ' + JSON.stringify(product));
+    console.log('isLoading' +isLoading);
+    console.log('errMess' +errMess);
+
     useEffect(()=>{
         if(id !== undefined){
             dispatch(listProductDetails(id));
@@ -28,9 +30,12 @@ function ProductDetails () {
     const addToCartHandler = () => {
         navigate(`/cart/${product._id}?qty=${items}`);
     }
+    console.log('product name: ' + product.name);
+    console.log('just before render: ' + JSON.stringify(product));
+
     return (
         <Container className="my-3">
-            <h1>Component</h1>
+            <h1>component</h1>
             <Link to='/home'>
                 <Button>
                     <i className="fa fa-arrow-left"></i>
