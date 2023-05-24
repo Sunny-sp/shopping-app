@@ -4,13 +4,15 @@ import { Provider } from 'react-redux';
 import { Router, BrowserRouter, Route, Routes } from 'react-router-dom';
 import React from 'react';
 import { configureStore } from '@reduxjs/toolkit';
-import * as redux from 'react-redux';
+import {useSelector} from 'react-redux';
 import * as routerDom from 'react-router-dom';
 import { productDetailReducer } from '../redux/productReducer';
 import store from '../redux/store';
 import CartScreen from './CartScreen';
-import {createMemoryHistory} from 'history'
-let mock;
+import { createMemoryHistory } from 'history'
+import { renderWithProviders } from '../setupTests';
+import { listProductDetails } from '../redux/actions/productActions';
+import axios from 'axios';
 
 const initialDetailState = {
   isLoading: false,
@@ -21,7 +23,7 @@ const initialDetailState = {
 const productDetails = {
   isLoading: false,
   product: {
-    "id": "456756856786",
+    "_id": "456756856786",
     "name": "Micromax IN 1b (Purple, 32 GB)",
     "image": "/images/micromaxInB.jpg",
     "description":
@@ -41,114 +43,52 @@ let mockStore = configureStore({
     reducer: productDetailReducer
   }, initialDetailState
 });
+const response = {
+  data: productDetails
+}
 
-jest.mock("react-redux", () => (
-  {
-    ...jest.requireActual('react-redux'),
-    useSelector: jest.fn(),
-    useDispatch: jest.fn()
-  }
-));
-// jest.mock("react-router-dom", () => (
-//   {
-//     ...jest.requireActual('react-router-dom'),
-//     useParams: jest.fn()
-//   }
-// ));
-// jest.mock('react-redux');
+jest.mock("axios");
 
 describe('validating ProductDetails component', () => {
-  // let tempSelector;
-  // beforeAll(() => {
-  //   tempSelector = jest.spyOn(redux, 'useSelector');
-  // });
-  beforeEach(() => {
-    // jest.spyOn(routerDom, 'useParams')
-    // .mockReturnValueOnce('456756856786');
+  it('should validate all elemets from productDetails page', async () => {
     // window.history.pushState({}, '', '/product/456756856786')
-    jest.spyOn(redux, 'useSelector')
-    .mockReturnValueOnce(productDetails);
-  });
+    // render(
+    //   <BrowserRouter >
+    //     <Provider store={store} >
+    //       <ProductDetails />
+    //     </Provider >
+    //   </BrowserRouter >
+    // );
 
-  // beforeEach(() => {
-  //   tempSelector.mockReturnValueOnce(productDetails);
+    await axios.get.mockImplementation(() => Promise.resolve(response));
+    await store.dispatch(listProductDetails('456756856786'));
 
-  //   jest.spyOn(routerDom, 'useParams')
-  //   .mockReturnValueOnce('456756856786');
-  // });
+    render(
+      <BrowserRouter >
+        <Provider store={store} >
+          <ProductDetails />
+        </Provider >
+      </BrowserRouter >
+    );
+    const prod = store.getState().productDetails.product;
+    console.log('after render' +JSON.stringify(prod));
+    // renderWithProviders(<ProductDetails />, { preloadedState: productDetails, store: store });
+    console.log(screen.debug());
+    expect(await screen.findByRole('heading', { name: 'Component' })).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: 'Add to cart' })
+    expect(button).toBeInTheDocument();
 
-  // it('should validate all elemets from productDetails page', async () => {
-  //   window.history.pushState({}, '', '/product/456756856786')
+    expect(screen.getByRole('link')).toBeInTheDocument();
 
-  //   render(
-  //     <BrowserRouter>
-  //       <Provider store={mockStore}>
-  //         <Routes>
-  //           <Route path='/product/:id' element={<ProductDetails />} />
-  //         </Routes>
-  //         // <ProductDetails />
-  //       </Provider>
-  //     </BrowserRouter>
-  //   );
+    expect(screen.getByRole('button', { name: 'Go Back' })).toBeInTheDocument();
 
-  //   expect(await screen.findByRole('heading', { name: 'Component' })).toBeInTheDocument();
-  //   const button = screen.getByRole('button', { name: 'Add to cart' })
-  //   expect(button).toBeInTheDocument();
+    expect(screen.getByRole('img')).toBeInTheDocument();
 
-  //   expect(screen.getByRole('link')).toBeInTheDocument();
+    expect(screen.getByText('Status', { exact: false })).toBeInTheDocument();
 
-  //   expect(screen.getByRole('button', { name: 'Go Back' })).toBeInTheDocument();
+    // await waitFor(() => {
+    //   expect(window.location.pathname).toBe('/product/456756856786');
+    // });
 
-  //   expect(screen.getByRole('img')).toBeInTheDocument();
-
-  //   expect(screen.getByText('Status', { exact: false })).toBeInTheDocument();
-
-  //   await waitFor(() => {
-  //     expect(window.location.pathname).toBe('/product/456756856786');
-  //   });
-  // });
-  // it('should validate back button is working', async () => {
-  //   window.history.pushState({}, '', '/product/456756856786')
-  //   const { debug } = render(
-  //     <BrowserRouter>
-  //       <Provider store={mockStore}>
-  //         <Routes>
-  //           <Route path='/product/:id' element={<ProductDetails />} />
-  //         </Routes>
-  //        // <ProductDetails />
-  //       </Provider>
-  //     </BrowserRouter>
-  //   );
-  //   console.log(debug());
-  //   const backButton = screen.getByRole('button', { name: /go back/i })
-  //   fireEvent.click(backButton);
-  //   console.log(debug());
-  //   await waitFor(() => {
-  //     expect(window.location.pathname).toBe('/home');
-  //   });
-  // });
-  it('should validate add to cart button is working', async () => {
-    try {
-      // const history = createMemoryHistory({initialEntries: ["/product/"]});
-      // jest.restoreAllMocks();
-      // jest.clearAllMocks();
-      // jest.deepUnmock();
-      const { debug } = render(
-        <BrowserRouter>
-          <Provider store={store}>
-            <ProductDetails />
-          </Provider>
-        </BrowserRouter>
-      );
-      console.log(debug());
-      const addButton = screen.getByRole('button', { name: /Add to cart/i })
-      await fireEvent.click(addButton);
-      // await waitFor(() => {
-      //   expect(window.location.pathname).toContain('/cart');
-      // });
-    } catch (error) {
-      console.log(error);
-      throw new Error(error);
-    }
   });
 });

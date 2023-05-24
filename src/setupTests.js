@@ -6,27 +6,24 @@ import '@testing-library/jest-dom';
 
 
 /////////////////////////////////
-
 import React from 'react'
 import { render } from '@testing-library/react'
 import { Provider } from 'react-redux'
-// As a basic setup, import your same slice reducers
-import productDetails from './redux/productReducer';
 import { BrowserRouter } from 'react-router-dom';
-import { configureStore } from '@reduxjs/toolkit';
 
 export function renderWithProviders(
   ui,
   {
-    initialState = {},
+    preloadedState = {},
     // Automatically create a store instance if no store was passed in
-    store = configureStore({ reducer: { reducer: productDetails }, initialState }),
+    store,
     ...renderOptions
   } = {}
 ) {
   function Wrapper({ children }) {
-    return (<BrowserRouter>
-        <Provider store={store}>{children}</Provider>
+    return (
+    <BrowserRouter>
+    <Provider store={store}>{children}</Provider>
     </BrowserRouter>
     )
   }
