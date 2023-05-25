@@ -142,7 +142,7 @@ describe('validating ProductDetails component', () => {
       );
       console.log(debug());
       const addButton = screen.getByRole('button', { name: /Add to cart/i })
-      await fireEvent.click(addButton);
+      fireEvent.click(addButton);
       // await waitFor(() => {
       //   expect(window.location.pathname).toContain('/cart');
       // });

@@ -1,17 +1,14 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProductDetails from './ProductDetails';
 import { Provider } from 'react-redux';
-import { Router, BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import React from 'react';
-import { configureStore } from '@reduxjs/toolkit';
-import {useSelector} from 'react-redux';
-import * as routerDom from 'react-router-dom';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { productDetailReducer } from '../redux/productReducer';
 import store from '../redux/store';
-import CartScreen from './CartScreen';
-import { createMemoryHistory } from 'history'
-import { renderWithProviders } from '../setupTests';
 import { listProductDetails } from '../redux/actions/productActions';
+import thunk from 'redux-thunk';
+import { applyMiddleware } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const initialDetailState = {
@@ -21,60 +18,50 @@ const initialDetailState = {
 }
 
 const productDetails = {
-  isLoading: false,
-  product: {
-    "_id": "456756856786",
-    "name": "Micromax IN 1b (Purple, 32 GB)",
-    "image": "/images/micromaxInB.jpg",
-    "description":
-      "Say hello to the Micromax IN 1b smartphone whose powerful MediaTek Helio G35 gaming processor and a 5000 mAh battery will pave the way for effortless multitasking and usage.",
-    "brand": "Micromax",
-    "category": "Electronics",
-    "price": 599.99,
-    "countInStock": 7,
-    "rating": 4,
-    "numReviews": 8
-  },
-  errMess: ''
-}
+  "_id": "456756856786",
+  "name": "Micromax IN 1b (Purple, 32 GB)",
+  "image": "/images/micromaxInB.jpg",
+  "description":
+    "Say hello to the Micromax IN 1b smartphone whose powerful MediaTek Helio G35 gaming processor and a 5000 mAh battery will pave the way for effortless multitasking and usage.",
+  "brand": "Micromax",
+  "category": "Electronics",
+  "price": 599.99,
+  "countInStock": 7,
+  "rating": 4,
+  "numReviews": 8
+};
 
-let mockStore = configureStore({
-  reducer: {
-    reducer: productDetailReducer
-  }, initialDetailState
+const reducers = combineReducers({
+  productDetails: productDetailReducer
 });
+// mocked store
+let mockStore = configureStore(
+  { reducer: reducers },
+  initialDetailState,
+  applyMiddleware([thunk])
+);
+// axios response
 const response = {
   data: productDetails
 }
-
+// mocking axios to dispatch an action and get mocked product details
 jest.mock("axios");
 
 describe('validating ProductDetails component', () => {
   it('should validate all elemets from productDetails page', async () => {
-    // window.history.pushState({}, '', '/product/456756856786')
-    // render(
-    //   <BrowserRouter >
-    //     <Provider store={store} >
-    //       <ProductDetails />
-    //     </Provider >
-    //   </BrowserRouter >
-    // );
-
     await axios.get.mockImplementation(() => Promise.resolve(response));
     await store.dispatch(listProductDetails('456756856786'));
-
+    // pushing initial pathname
+    window.history.pushState({}, '', '/product/456756856786')
     render(
-      <BrowserRouter >
-        <Provider store={store} >
+      <Provider store={store} >
+        <BrowserRouter>
           <ProductDetails />
-        </Provider >
-      </BrowserRouter >
+        </BrowserRouter >
+      </Provider >
     );
-    const prod = store.getState().productDetails.product;
-    console.log('after render' +JSON.stringify(prod));
-    // renderWithProviders(<ProductDetails />, { preloadedState: productDetails, store: store });
-    console.log(screen.debug());
-    expect(await screen.findByRole('heading', { name: 'Component' })).toBeInTheDocument();
+    // console.log(screen.debug());
+    expect(await screen.findByRole('heading', { name: 'component' })).toBeInTheDocument();
     const button = screen.getByRole('button', { name: 'Add to cart' })
     expect(button).toBeInTheDocument();
 
@@ -85,10 +72,51 @@ describe('validating ProductDetails component', () => {
     expect(screen.getByRole('img')).toBeInTheDocument();
 
     expect(screen.getByText('Status', { exact: false })).toBeInTheDocument();
+    // validating current pathname
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/product/456756856786');
+    });
+  });
 
+  it('should validate back button is working', async () => {
+    window.history.pushState({}, '', '/product/456756856786')
+    render(
+      <Provider store={store} >
+        <BrowserRouter>
+          <ProductDetails />
+        </BrowserRouter >
+      </Provider >
+    );
+    // console.log(screen.debug());
+    const backButton = screen.getByRole('button', { name: /go back/i })
+    fireEvent.click(backButton);
+    // validating  pathname after clicking on back button
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/home');
+    });
+  });
+
+  it('should validate add to cart button is working', async () => {
+    window.history.pushState({}, '', '/product/456756856786')
+    render(
+      <BrowserRouter>
+        <Provider store={store} >
+          <ProductDetails />
+        </Provider >
+      </BrowserRouter >
+    );
+    // const dropDown = await screen.findByRole('combobox', { name: 'item-qty'});
+    // fireEvent.click(dropDown);
+    // const option = await screen.findByRole('option', { name: 5});
+    // fireEvent.click(option);
     // await waitFor(() => {
-    //   expect(window.location.pathname).toBe('/product/456756856786');
+    //   expect(screen.getByRole('option', {name: 5})).toBeInTheDocument();
     // });
-
+    const addButton = screen.getByRole('button', { name: /Add to cart/i })
+    fireEvent.click(addButton);
+    // validating  pathname after clicking on add to cart button
+    await waitFor(() => {
+      expect(window.location.pathname).toContain('/cart/456756856786');
+    });
   });
 });

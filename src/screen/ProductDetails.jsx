@@ -13,7 +13,6 @@ function ProductDetails () {
     const productDetails = useSelector(state => state.productDetails);
     const { isLoading, product, errMess } = productDetails
     console.log('product: ' + JSON.stringify(productDetails.product.name));
-    console.log('useSlector: ' + JSON.stringify(product));
     console.log('isLoading' +isLoading);
     console.log('errMess' +errMess);
 
@@ -30,8 +29,6 @@ function ProductDetails () {
     const addToCartHandler = () => {
         navigate(`/cart/${product._id}?qty=${items}`);
     }
-    console.log('product name: ' + product.name);
-    console.log('just before render: ' + JSON.stringify(product));
 
     return (
         <Container className="my-3">
@@ -75,7 +72,7 @@ function ProductDetails () {
                                 <Row>
                                     <Col md={5}>QTY: </Col>
                                     <Col>
-                                        <Form.Select onChange={e => selectItems(e)}>
+                                        <Form.Select id='selectQuantity' aria-label="item-qty" onChange={e => selectItems(e)}>
                                             {
                                                 [...Array(product.countInStock).keys()].map((x, index) => 
                                                       {return <option key={x + index} value={x+1}>{x+1}</option>}
