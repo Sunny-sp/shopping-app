@@ -10,12 +10,13 @@ const reducers =combineReducers({
     productDetails: productDetailReducer,
     cart: cartReducer
 });
-// const initialState = {
-//     cart: { cartItems: cartItemsFromStorage}
-// };
+const initialState = {
+    cart: { cartItems: cartItemsFromStorage}
+};
 const middleWares =[thunk];
 const store = configureStore(
     {reducer: reducers},
+    initialState,
     applyMiddleware(middleWares)
 )
 

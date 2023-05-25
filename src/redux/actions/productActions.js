@@ -6,7 +6,6 @@ export const listProducts = () => async (dispatch) => {
     try {
         dispatch({ type: ACTION_TYPES.PRODUCT_LIST_REQUEST });
         const response = await axios.get(baseUrl + 'products');
-        console.log('products: ' + JSON.stringify(response.data));
         dispatch({
             type: ACTION_TYPES.PRODUCT_LIST_SUCCESS,
             payload: response.data
@@ -23,12 +22,10 @@ export const listProductDetails = (id) => async (dispatch) => {
     try {
         dispatch({ type: ACTION_TYPES.PRODUCT_DETAIL_REQUEST });
         const response = await axios.get(baseUrl + 'products/' + id);
-        console.log('product details: ' + JSON.stringify(response.data));
         dispatch({
             type: ACTION_TYPES.PRODUCT_DETAIL_SUCCESS,
             payload: response.data
         });
-        console.log('after dispatch: ' + JSON.stringify(response.data));
     } catch (error) {
         dispatch({
             type: ACTION_TYPES.PRODUCT_DETAIL_FAILED,
