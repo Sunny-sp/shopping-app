@@ -6,6 +6,7 @@ import {useNavigate} from 'react-router-dom'
 import { listProductDetails } from '../redux/actions/productActions';
 import { useDispatch, useSelector } from "react-redux";
 // const baseUrl = 'http://localhost:8080/';
+
 function ProductDetails () {
     const {id} = useParams();
     // console.log('id of the product: ' + id);
@@ -23,6 +24,7 @@ function ProductDetails () {
     },[dispatch, id]);
     const navigate = useNavigate();
     const [items, setItems] =useState(1);
+
     const selectItems = (e) => {
         setItems(e.target.value)
     }
@@ -72,7 +74,7 @@ function ProductDetails () {
                                 <Row>
                                     <Col md={5}>QTY: </Col>
                                     <Col>
-                                        <Form.Select id='selectQuantity' aria-label="item-qty" onChange={e => selectItems(e)}>
+                                        <Form.Select aria-valuenow={items} data-testid='items-qty' aria-label="select"  onChange={e => selectItems(e)}>
                                             {
                                                 [...Array(product.countInStock).keys()].map((x, index) => 
                                                       {return <option key={x + index} value={x+1}>{x+1}</option>}

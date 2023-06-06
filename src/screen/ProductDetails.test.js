@@ -40,6 +40,7 @@ let mockStore = configureStore(
   initialDetailState,
   applyMiddleware([thunk])
 );
+
 // axios response
 const response = {
   data: productDetails
@@ -105,12 +106,14 @@ describe('validating ProductDetails component', () => {
         </Provider >
       </BrowserRouter >
     );
-    // const dropDown = await screen.findByRole('combobox', { name: 'item-qty'});
+    // const dropDown = await screen.findByRole('combobox', { name: 'select'});
     // fireEvent.click(dropDown);
     // const option = await screen.findByRole('option', { name: 5});
+    // // fireEvent.change(screen.getByLabelText('select', { target :{value : '4'}}));
     // fireEvent.click(option);
+    // const currentValue =  screen.getByTestId('items-qty')
     // await waitFor(() => {
-    //   expect(screen.getByRole('option', {name: 5})).toBeInTheDocument();
+    //   expect(currentValue).toHaveAttribute('aria-valuenow','4');
     // });
     const addButton = screen.getByRole('button', { name: /Add to cart/i })
     fireEvent.click(addButton);
@@ -119,4 +122,5 @@ describe('validating ProductDetails component', () => {
       expect(window.location.pathname).toContain('/cart/456756856786');
     });
   });
+
 });
